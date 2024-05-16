@@ -1,3 +1,5 @@
+from contextlib import asynccontextmanager
+
 from fastapi import FastAPI
 
 from fastapi_mqtt.config import MQTTConfig
@@ -12,9 +14,14 @@ mqtt_config = MQTTConfig(
 fast_mqtt = FastMQTT(config=mqtt_config)
 
 
-app = FastAPI()
+@asynccontextmanager
+async def _lifespan(_app: FastAPI):
+    await fast_mqtt.mqtt_startup()
+    yield
+    await fast_mqtt.mqtt_shutdown()
 
-fast_mqtt.init_app(app)
+
+app = FastAPI(lifespan=_lifespan)
 
 
 @fast_mqtt.on_connect()
