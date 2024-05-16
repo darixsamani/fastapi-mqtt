@@ -4,7 +4,6 @@ import uuid
 from itertools import zip_longest
 from typing import Any, Callable, Dict, List, Optional, Tuple
 
-from fastapi import FastAPI
 from gmqtt import Client as MQTTClient
 from gmqtt import Message, Subscription
 from gmqtt.mqtt.constants import MQTTv50
@@ -231,14 +230,14 @@ class FastMQTT:
         """Final disconnection for MQTT client, for lifespan shutdown."""
         await self.client.disconnect()
 
-    def init_app(self, app: FastAPI) -> None:  # pragma: no cover
+    def init_app(self, fastapi_app) -> None:  # pragma: no cover
         """Add startup and shutdown event handlers for app without lifespan."""
 
-        @app.on_event("startup")
+        @fastapi_app.on_event("startup")
         async def startup() -> None:
             await self.mqtt_startup()
 
-        @app.on_event("shutdown")
+        @fastapi_app.on_event("shutdown")
         async def shutdown() -> None:
             await self.mqtt_shutdown()
 
