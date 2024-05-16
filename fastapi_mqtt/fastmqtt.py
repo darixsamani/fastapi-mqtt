@@ -10,7 +10,13 @@ from gmqtt import Message, Subscription
 from gmqtt.mqtt.constants import MQTTv50
 
 from .config import MQTTConfig
-from .handlers import MQTTHandlers
+from .handlers import (
+    MQTTConnectionHandler,
+    MQTTDisconnectHandler,
+    MQTTHandlers,
+    MQTTMessageHandler,
+    MQTTSubscriptionHandler,
+)
 
 try:
     from uvicorn.config import logger as log_info
@@ -67,7 +73,7 @@ class FastMQTT:
         self.client._connect_properties = kwargs
         self.client.on_message = self.__on_message
         self.client.on_connect = self.__on_connect
-        self.subscriptions: Dict[str, Tuple[Subscription, List[Callable]]] = {}
+        self.subscriptions: Dict[str, Tuple[Subscription, List[MQTTMessageHandler]]] = {}
         self._logger = mqtt_logger or log_info
         self.mqtt_handlers = MQTTHandlers(self.client, self._logger)
 
@@ -249,7 +255,7 @@ class FastMQTT:
         Decorator method used to subscribe for specific topics.
         """
 
-        def subscribe_handler(handler: Callable) -> Callable:
+        def subscribe_handler(handler: MQTTMessageHandler) -> MQTTMessageHandler:
             self._logger.debug("Subscribe for topics: %s", topics)
             for topic in topics:
                 if topic not in self.subscriptions:
@@ -290,7 +296,7 @@ class FastMQTT:
         Decorator method used to handle the connection to MQTT.
         """
 
-        def connect_handler(handler: Callable) -> Callable:
+        def connect_handler(handler: MQTTConnectionHandler) -> MQTTConnectionHandler:
             self._logger.debug("handler accepted")
             return self.mqtt_handlers.on_connect(handler)
 
@@ -301,7 +307,7 @@ class FastMQTT:
         The decorator method is used to subscribe to messages from all topics.
         """
 
-        def message_handler(handler: Callable) -> Callable:
+        def message_handler(handler: MQTTMessageHandler) -> MQTTMessageHandler:
             self._logger.debug("on_message handler accepted")
             return self.mqtt_handlers.on_message(handler)
 
@@ -312,7 +318,7 @@ class FastMQTT:
         The Decorator method used wrap disconnect callback.
         """
 
-        def disconnect_handler(handler: Callable) -> Callable:
+        def disconnect_handler(handler: MQTTDisconnectHandler) -> MQTTDisconnectHandler:
             self._logger.debug("on_disconnect handler accepted")
             return self.mqtt_handlers.on_disconnect(handler)
 
@@ -323,7 +329,7 @@ class FastMQTT:
         Decorator method is used to obtain subscribed topics and properties.
         """
 
-        def subscribe_handler(handler: Callable):
+        def subscribe_handler(handler: MQTTSubscriptionHandler) -> MQTTSubscriptionHandler:
             self._logger.debug("on_subscribe handler accepted")
             return self.mqtt_handlers.on_subscribe(handler)
 
