@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "fastapi-mqtt"
-version = "2.1.1"
+version = "2.2.0"
 description = "fastapi-mqtt is extension for MQTT protocol"
 authors = ["sabuhish <sabuhi.shukurov@gmail.com>"]
 license = "MIT"
@@ -11,24 +11,24 @@ classifiers = [
     "Intended Audience :: Developers",
     "Programming Language :: Python",
     "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.7",
     "Programming Language :: Python :: 3.8",
     "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
     "Programming Language :: Python :: 3 :: Only",
     "License :: OSI Approved :: MIT License",
     "Operating System :: OS Independent",
 ]
 [tool.poetry.dependencies]
-python = "^3.7"
-fastapi = ">=0.103"
+python = "^3.8"
 gmqtt = ">=0.6.11"
 pydantic = ">=2.3.0"
-uvicorn = ">=0.19.0"
 
 [tool.poetry.dev-dependencies]
 pre-commit = ">=2.9.2,<3"
+fastapi = ">=0.103"
+uvicorn = ">=0.19.0"
 pytest = ">=7.0.0"
 pytest-cov = ">=3.0.0"
 pytest-asyncio = ">=0.16.0"
@@ -39,14 +39,32 @@ requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"
 
 [tool.ruff]
-select = ["A", "ASYNC", "B", "BLE", "C", "C4", "E", "F", "FA", "I", "INT", "N", "PIE", "PTH", "RUF", "SIM", "TCH", "W", "YTT"]
 target-version = "py311"
 fix = true
 line-length = 100
 
-[tool.ruff.isort]
+[tool.ruff.lint]
+select = ["A", "ASYNC", "B", "BLE", "C", "C4", "E", "F", "FA", "I", "INT", "N", "PIE", "PTH", "RUF", "SIM", "TCH", "W", "YTT"]
+
+[tool.ruff.lint.isort]
 known-first-party = ["fastapi_mqtt"]
 order-by-type = false
+
+[tool.mypy]
+plugins = ["pydantic.mypy"]
+
+follow_imports = "silent"
+warn_redundant_casts = true
+warn_unused_ignores = true
+disallow_any_generics = true
+check_untyped_defs = true
+no_implicit_reexport = true
+
+[tool.pydantic-mypy]
+init_forbid_extra = true
+init_typed = true
+warn_required_dynamic_aliases = true
+
 
 [tool.pytest.ini_options]
 minversion = 7.0

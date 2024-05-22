@@ -8,6 +8,10 @@ from gmqtt import Client as MQTTClient
 MQTTMessageHandler = Callable[[MQTTClient, str, bytes, int, Any], Awaitable[Any]]
 # client: MQTTClient, flags: int, rc: int, properties: Any
 MQTTConnectionHandler = Callable[[MQTTClient, int, int, Any], Any]
+# client: MQTTClient, mid: int, qos: int, properties: Any
+MQTTSubscriptionHandler = Callable[[MQTTClient, int, int, Any], Any]
+# client: MQTTClient, packet: bytes, exc=None
+MQTTDisconnectHandler = Callable[[MQTTClient, bytes, Optional[Exception]], Any]
 
 
 class MQTTHandlers:
@@ -22,7 +26,7 @@ class MQTTHandlers:
         self.user_message_handler = handler
         return handler
 
-    def on_subscribe(self, handler: Callable) -> Callable[..., Any]:
+    def on_subscribe(self, handler: MQTTSubscriptionHandler) -> MQTTSubscriptionHandler:
         """
         Decorator method is used to obtain subscribed topics and properties.
         """
@@ -30,7 +34,7 @@ class MQTTHandlers:
         self.client.on_subscribe = handler
         return handler
 
-    def on_disconnect(self, handler: Callable) -> Callable[..., Any]:
+    def on_disconnect(self, handler: MQTTDisconnectHandler) -> MQTTDisconnectHandler:
         self.client.on_disconnect = handler
         return handler
 

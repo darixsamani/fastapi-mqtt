@@ -2,7 +2,7 @@ from ssl import SSLContext
 from typing import Optional, Union
 
 from gmqtt.mqtt.constants import MQTTv50
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel, ConfigDict, Field
 
 
 class MQTTConfig(BaseModel):
@@ -47,7 +47,7 @@ class MQTTConfig(BaseModel):
     keepalive: int = 60
     username: Optional[str] = None
     password: Optional[str] = None
-    version: int = MQTTv50
+    version: int = Field(default=MQTTv50, ge=4, le=5)
 
     reconnect_retries: Optional[int] = 1
     reconnect_delay: Optional[int] = 6

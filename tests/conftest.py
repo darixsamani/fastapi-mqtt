@@ -33,8 +33,8 @@ def test_app():  # noqa: C901
         password=TEST_BROKER_PWD,
     )
     fast_mqtt = FastMQTT(config=mqtt_config)
-    received_msgs = defaultdict(int)
-    processed_msgs = defaultdict(int)
+    received_msgs: dict[str, int] = defaultdict(int)
+    processed_msgs: dict[str, int] = defaultdict(int)
 
     @asynccontextmanager
     async def _lifespan(_application: FastAPI):
